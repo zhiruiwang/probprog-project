@@ -53,6 +53,7 @@ python-dateutil==2.6.1    # via jupyter-client, matplotlib, pandas
 pytz==2017.2              # via matplotlib, pandas
 pyzmq==16.0.2             # via jupyter-client
 qtconsole==4.3.1          # via jupyter
+scikit-learn==0.19.1
 seaborn==0.8.1
 simplegeneric==0.8.1      # via ipython
 six==1.11.0
