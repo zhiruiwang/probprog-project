@@ -23,6 +23,7 @@ jupyter-client==5.1.0     # via ipykernel, jupyter-console, notebook, qtconsole
 jupyter-console==5.2.0    # via jupyter
 jupyter-core==4.3.0       # via jupyter-client, nbconvert, nbformat, notebook, qtconsole
 jupyter==1.0.0
+Keras==2.1.1
 markdown==2.6.9           # via tensorflow-tensorboard
 markupsafe==1.0           # via jinja2
 matplotlib==2.0.2
