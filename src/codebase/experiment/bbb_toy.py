@@ -29,7 +29,7 @@ y = tf.placeholder(tf.float32, shape=None, name='y')
 # Model Parameters
 # Layer 1
 W1_mu = tf.Variable(tf.truncated_normal([D, H], stddev=sigma))
-W1_rho = tf.Variable(tf.truncated_normal([D, H], mean=1.0, stddev=sigma)) 
+W1_rho = tf.Variable(tf.truncated_normal([D, H], mean=1.0, stddev=sigma))
 b1_mu = tf.Variable(tf.zeros([H]))
 b1_rho = tf.Variable(tf.zeros([H]))
 
@@ -75,24 +75,25 @@ for _ in range(n_sample):
     h = tf.nn.softmax(tf.nn.relu(tf.matmul(h, W3) + b3))
 
     # Calculate log probabilities
-    for W, b, W_mu, W_rho, b_mu, b_rho in [(W1, b1, W1_mu, W1_rho, b1_mu, b1_rho),
-                                           (W2, b2, W2_mu, W2_rho, b2_mu, b2_rho),
-                                           (W3, b3, W3_mu, W3_rho, b3_mu, b3_rho)]:
+    for W, b, W_mu, W_rho, b_mu, b_rho in [
+            (W1, b1, W1_mu, W1_rho, b1_mu, b1_rho),
+            (W2, b2, W2_mu, W2_rho, b2_mu, b2_rho),
+            (W3, b3, W3_mu, W3_rho, b3_mu, b3_rho)]:
         # Calculate log priors
         log_pw = log_pw + tf.reduce_sum(log_gaussian(W, 0., 1.)) + \
-                tf.reduce_sum(log_gaussian(b, 0., 1.))
+            tf.reduce_sum(log_gaussian(b, 0., 1.))
         # Calculate log variational distributions
         log_qw = log_qw + tf.reduce_sum(log_gaussian_(W, W_mu, W_rho * 2)) + \
-                tf.reduce_sum(log_gaussian_(b, b_mu, b_rho * 2))
+            tf.reduce_sum(log_gaussian_(b, b_mu, b_rho * 2))
     # Calculate log likelihood
     log_pD = tf.reduce_sum(log_gaussian(y, h, 1.))
-    
+
 # Calculate log probabilities over samples
 log_qw = log_qw / n_sample
 log_pw = log_pw / n_sample
 log_pD = log_pD / n_sample
 
-current_batch = tf.placeholder(tf.float32, shape = None, name = 'i')
+current_batch = tf.placeholder(tf.float32, shape=None, name='i')
 pi = (2 ** (n_batch - current_batch - 1)) / (2 ** n_batch - 1)
 KL = tf.reduce_sum(pi * (log_qw - log_pw) - log_pD) / float(M)
 train_step = tf.train.AdamOptimizer(learning_rate).minimize(KL)
@@ -111,11 +112,14 @@ with tf.Session() as sess:
         pi_list = []
         for i in range(n_batch):
             batch = mnist.train.next_batch(M)
-            results = sess.run([KL, train_step, pi, W2_rho], \
-                feed_dict={x: batch[0], y: batch[1], current_batch: i})
+            results = sess.run([KL, train_step, pi, W2_rho],
+                               feed_dict={x: batch[0],
+                                          y: batch[1],
+                                          current_batch: i})
             KL_list.append(results[0])
             pi_list.append(np.mean(results[3]))
         if n % 2 == 0:
-            print("Epoch:", '%04d' % (n + 1), "cost=", "{:.9f}".format(results[0]))
+            print("Epoch:", '%04d' %
+                  (n + 1), "cost=", "{:.9f}".format(results[0]))
         print('test accuracy %g' % accuracy.eval(feed_dict={
             x: mnist.test.images, y: mnist.test.labels, current_batch: i}))
