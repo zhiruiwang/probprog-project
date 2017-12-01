@@ -47,8 +47,8 @@ def LSTM_cell(hprev, cprev, xt, Wf, Uf, Wi, Ui, Wo, Uo, Wc, Uc,
     f = rnn_cell_sig(hprev, xt, Wf, Uf, bf)
     i = rnn_cell_sig(hprev, xt, Wi, Ui, bi)
     o = rnn_cell_sig(hprev, xt, Wo, Uo, bo)
-    c = f*cprev + i*rnn_cell_tanh(hprev, xt, Wc, Uc, bc)
-    h = o*tf.tanh(c)
+    c = f * cprev + i * rnn_cell_tanh(hprev, xt, Wc, Uc, bc)
+    h = o * tf.tanh(c)
     return h, c
 
 
@@ -67,7 +67,7 @@ def LSTM_layer(X, Wf, Uf, Wi, Ui, Wo, Uo, Wc, Uc,
 def GRU_cell(hprev, xt, Wz, Uz, Wr, Ur, Wh, Uh, bz, br, bh):
     z = rnn_cell_sig(hprev, xt, Wz, Uz, bz)
     r = rnn_cell_sig(hprev, xt, Wr, Ur, br)
-    h = z*hprev + (1-z)*rnn_cell_tanh(r*hprev, xt, Wh, Uh, bh)
+    h = z * hprev + (1 - z) * rnn_cell_tanh(r * hprev, xt, Wh, Uh, bh)
     return h
 
 
@@ -128,7 +128,7 @@ def two_GRU_layer(X, Wz1, Uz1, Wr1, Ur1, Wh1, Uh1, bz1, br1, bh1,
 def model_inference_critisism(model_name, Bayesian, seq_array1, seq_array2,
                               label_array1, label_array2, sequence_length,
                               N, D, H=100, H1=100, H2=50):
-    less_50 = label_array2 <=50
+    less_50 = label_array2 <= 50
     if not Bayesian:
         model = Sequential()
         if model_name == 'Fully Connected Layer':
@@ -173,13 +173,13 @@ def model_inference_critisism(model_name, Bayesian, seq_array1, seq_array2,
             nadam = Nadam(lr=0.05)
             model.compile(loss='mean_squared_error',
                           optimizer=nadam, metrics=['mean_squared_error'])
-            model.fit(seq_array1[:, sequence_length-1, :], label_array1,
+            model.fit(seq_array1[:, sequence_length - 1, :], label_array1,
                       epochs=300, batch_size=200,
-                      validation_data=(seq_array2[:, sequence_length-1, :],
+                      validation_data=(seq_array2[:, sequence_length - 1, :],
                                        label_array2),
                       verbose=0)
             y_pred = np.squeeze(model.predict(
-                seq_array2[:, sequence_length-1, :]))
+                seq_array2[:, sequence_length - 1, :]))
         else:
             model.compile(loss='mean_squared_error',
                           optimizer='nadam', metrics=['mean_squared_error'])
@@ -239,14 +239,14 @@ def model_inference_critisism(model_name, Bayesian, seq_array1, seq_array2,
             # this will take a couple of minutes
             inference = ed.KLqp(latent_vars={W_0: q_W_0, b_0: q_b_0,
                                              W_1: q_W_1, b_1: q_b_1},
-                                data={x: seq_array1[:, sequence_length-1, :],
+                                data={x: seq_array1[:, sequence_length - 1, :],
                                       y: label_array1})
             inference.run(n_samples=5, n_iter=25000)
             xp = tf.placeholder(tf.float32, seq_array2[
-                                :, sequence_length-1, :].shape)
+                                :, sequence_length - 1, :].shape)
             y_preds = [sess.run(neural_network_with_2_layers(xp, q_W_0, q_W_1,
                                                              q_b_0, q_b_1),
-                                {xp: seq_array2[:, sequence_length-1, :]})
+                                {xp: seq_array2[:, sequence_length - 1, :]})
                        for _ in range(50)]
         elif model_name == 'Simple RNN':
             Wh = Normal(loc=tf.zeros([H, H]), scale=tf.ones([H, H]))
@@ -753,12 +753,12 @@ def model_inference_critisism(model_name, Bayesian, seq_array1, seq_array2,
         plt.xlabel('RUL')
         plt.show()
         # RMSE
-        print('Average Validation RMSE: {}'.format(np.mean([np.sqrt( \
-          mean_squared_error(label_array2,y_pred)) for y_pred in y_preds])))
+        print('Average Validation RMSE: {}'.format(np.mean([np.sqrt(
+            mean_squared_error(label_array2, y_pred)) for y_pred in y_preds])))
         print('Average Validation RMSE for RUL under 50: {}'.format(
-                np.mean([np.sqrt(mean_squared_error(label_array2[less_50],
-                                                    y_pred[less_50]))
-                     for y_pred in y_preds])))
+                np.mean([np.sqrt(mean_squared_error(
+                        label_array2[less_50], y_pred[less_50]))
+                        for y_pred in y_preds])))
         # Prediction time series
         pd.DataFrame([label_array2, y_preds[0]]).transpose().rename(
             columns={0: 'True', 1: 'Pred'})[-1500:].plot()
@@ -769,14 +769,16 @@ def model_inference_critisism(model_name, Bayesian, seq_array1, seq_array2,
         [plt.plot(y_pred[-1500:], color='black', alpha=0.1)
          for y_pred in y_preds]
         plt.plot(label_array2[-1500:])
-        plt.title('Distribution of Prediction of RUL, Bayesian {}'.format(model_name))
+        plt.title('Distribution of Prediction of RUL, Bayesian {}'.format(
+            model_name))
         plt.xlabel('RUL(last 1500 days)')
         plt.show()
         # Posterior prediction distribution 150
         [plt.plot(y_pred[-150:], color='black', alpha=0.1)
          for y_pred in y_preds]
         plt.plot(label_array2[-150:])
-        plt.title('Distribution of Prediction of RUL, Bayesian {}'.format(model_name))
+        plt.title('Distribution of Prediction of RUL, Bayesian {}'.format(
+            model_name))
         plt.xlabel('RUL(last 150 days)')
         plt.show()
     else:

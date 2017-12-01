@@ -60,7 +60,7 @@ def turbo_preprocessing(train_df, test_df, truth_df):
 def gen_sequence(id_df, seq_length, seq_cols):
     data_array = id_df[seq_cols].values
     num_elements = data_array.shape[0]
-    for start, stop in zip(range(0, num_elements-seq_length),
+    for start, stop in zip(range(0, num_elements - seq_length),
                            range(seq_length, num_elements)):
         yield data_array[start:stop, :]
 
