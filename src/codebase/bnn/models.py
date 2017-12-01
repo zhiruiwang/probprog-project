@@ -4,7 +4,6 @@ import tensorflow as tf
 import edward as ed
 from edward.models import Normal
 from sklearn.metrics import mean_squared_error
-from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 import seaborn as sns
 from tensorflow.contrib.keras.api.keras.models import Sequential
@@ -12,7 +11,6 @@ from tensorflow.contrib.keras.api.keras.layers import Dense
 from tensorflow.contrib.keras.api.keras.layers import SimpleRNN
 from tensorflow.contrib.keras.api.keras.layers import LSTM
 from tensorflow.contrib.keras.api.keras.layers import GRU
-from tensorflow.contrib.keras.api.keras.layers import Activation
 from tensorflow.contrib.keras.api.keras.optimizers import Nadam
 
 
@@ -130,6 +128,7 @@ def two_GRU_layer(X, Wz1, Uz1, Wr1, Ur1, Wh1, Uh1, bz1, br1, bh1,
 def model_inference_critisism(model_name, Bayesian, seq_array1, seq_array2,
                               label_array1, label_array2, sequence_length,
                               N, D, H=100, H1=100, H2=50):
+    less_50 = label_array2 <=50
     if not Bayesian:
         model = Sequential()
         if model_name == 'Fully Connected Layer':
@@ -194,18 +193,20 @@ def model_inference_critisism(model_name, Bayesian, seq_array1, seq_array2,
         sns.distplot(y_pred)
         plt.title('Histogram of RUL, Frequentist {}'.format(model_name))
         plt.xlabel('RUL')
+        plt.show()
 
         # RMSE
-        print(f'Validation RMSE: {np.sqrt(
-            mean_squared_error(label_array2, y_pred))}')
-        print(f'Validation RMSE for RUL under 50: {np.sqrt(
-            mean_squared_error(label_array2[less_50], y_pred[less_50]))}')
+        print('Validation RMSE: {}'.format(np.sqrt(
+            mean_squared_error(label_array2, y_pred))))
+        print('Validation RMSE for RUL under 50: {}'.format(np.sqrt(
+            mean_squared_error(label_array2[less_50], y_pred[less_50]))))
 
         # Prediction time series
         pd.DataFrame([label_array2, y_pred]).transpose().rename(
             columns={0: 'True', 1: 'Pred'})[-1500:].plot()
-        plt.title(f'Prediction of RUL, Frequentist {model_name}')
+        plt.title('Prediction of RUL, Frequentist {}'.format(model_name))
         plt.xlabel('RUL')
+        plt.show()
 
     elif Bayesian:
         if model_name == 'Fully Connected Layer':
@@ -748,32 +749,36 @@ def model_inference_critisism(model_name, Bayesian, seq_array1, seq_array2,
         # Critisism
         # Histogram
         sns.distplot(y_preds[0])
-        plt.title(f'Histogram of RUL, Bayesian {model_name}')
+        plt.title('Histogram of RUL, Bayesian {}'.format(model_name))
         plt.xlabel('RUL')
+        plt.show()
         # RMSE
-        print(f'Average Validation RMSE: {np.mean([np.sqrt( \
-          mean_squared_error(label_array2,y_pred)) for y_pred in y_preds])}')
-        print(f'Average Validation RMSE for RUL under 50: {
-            np.mean([np.sqrt(mean_squared_error(label_array2[less_50],
-                                                y_pred[less_50]))
-                     for y_pred in y_preds])}')
+        print('Average Validation RMSE: {}'.format(np.mean([np.sqrt( \
+          mean_squared_error(label_array2,y_pred)) for y_pred in y_preds])))
+        print('Average Validation RMSE for RUL under 50: {}'.format(
+                np.mean([np.sqrt(mean_squared_error(label_array2[less_50],
+                                                    y_pred[less_50]))
+                     for y_pred in y_preds])))
         # Prediction time series
         pd.DataFrame([label_array2, y_preds[0]]).transpose().rename(
             columns={0: 'True', 1: 'Pred'})[-1500:].plot()
-        plt.title(f'Prediction of RUL, Bayesian {model_name}')
+        plt.title('Prediction of RUL, Bayesian {}'.format(model_name))
         plt.xlabel('RUL')
+        plt.show()
         # Posterior prediction distribution 1500
         [plt.plot(y_pred[-1500:], color='black', alpha=0.1)
          for y_pred in y_preds]
         plt.plot(label_array2[-1500:])
-        plt.title(f'Distribution of Prediction of RUL, Bayesian {model_name}')
+        plt.title('Distribution of Prediction of RUL, Bayesian {}'.format(model_name))
         plt.xlabel('RUL(last 1500 days)')
+        plt.show()
         # Posterior prediction distribution 150
         [plt.plot(y_pred[-150:], color='black', alpha=0.1)
          for y_pred in y_preds]
         plt.plot(label_array2[-150:])
-        plt.title(f'Distribution of Prediction of RUL, Bayesian {model_name}')
+        plt.title('Distribution of Prediction of RUL, Bayesian {}'.format(model_name))
         plt.xlabel('RUL(last 150 days)')
+        plt.show()
     else:
         raise Exception(
             'Please specify a boolean for use Bayesian inference or not!')
