@@ -8,7 +8,7 @@
 ## Run
 
 ```
-python3 get_outpu.py
+python3 get_output.py
 ```
 
-It will print out all the metrics and plots for the Critisism part in the notebook, both frequentist and Bayesian
+It will print out all the metrics and plots for the critisism part in the notebook, both frequentist and Bayesian
