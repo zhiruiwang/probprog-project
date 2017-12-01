@@ -1,0 +1,3 @@
+# Data
+
+[Turbofan Engine Degradation Simulation Data Set](https://ti.arc.nasa.gov/tech/dash/groups/pcoe/prognostic-data-repository/#turbofan) provided by NASA. It has 26 columns. The first is the id, which is an identification of a single turbofan. The second is the cycle, which is the timestamp starts from 1 when a turbofan start to run. The remaining 24 columns contain 3 settings and 21 sensor readings of the turbofan at that timestamp. When a turbofan breaks down, the record of that turbofan will end. 
