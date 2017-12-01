@@ -77,7 +77,7 @@ n_epoch_decay = input_args.n_epoch_decay
 print("Loading and preprocessing dataset...")
 
 # Load data
-train_df, test_df = load_and_preprocess(download=False)
+train_df, test_df = load_and_preprocess(download=download)
 
 # Build datasets based on the given configuration
 X_train, y_train = config_data(train_df, seq_length, batch_size)
