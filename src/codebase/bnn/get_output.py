@@ -56,4 +56,4 @@ for model in valid_models:
     for bayes in [True, False]:
         model_inference_critisism(model, bayes, seq_array1,
                                   seq_array2, label_array1, label_array2,
-                                  sequence_length, N, D, H=10, H1=100, H2=50)
+                                  sequence_length, N, D, H=100, H1=100, H2=50)
